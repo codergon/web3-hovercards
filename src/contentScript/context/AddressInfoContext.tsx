@@ -13,7 +13,21 @@ import { avatars } from "../constants/avatar";
 import { InfuraProvider } from "@ethersproject/providers";
 import { INFURA_API_KEY, INFURA_API_KEY_SECRET } from "../constants/infura";
 
+const ensNameRegex = /[a-zA-Z0-9-]+\.eth\b/g;
 const ethAddressRegex = /(0x[a-fA-F0-9]{40})/;
+const ethAddressRegexText = /0x[a-fA-F0-9]{40}\b/g;
+const validTags = [
+  "div",
+  "span",
+  "p",
+  "li",
+  "em",
+  "i",
+  "b",
+  "td",
+  "strong",
+  "small",
+];
 
 const Auth = btoa(INFURA_API_KEY + ":" + INFURA_API_KEY_SECRET);
 
@@ -291,68 +305,158 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
   }, [isHovering]);
 
   useEffect(() => {
-    const attachEventListeners = () => {
-      const links = Array.from(document.getElementsByTagName("a"));
+    const attachListeners = (
+      element: HTMLElement & { href?: string },
+      ethAddress?: string
+    ) => {
+      if (
+        ethAddressRegex.test(ethAddress) ||
+        ethAddressRegex.test(element?.href)
+      ) {
+        // On Mouse Enter
+        element.addEventListener("mouseenter", event => {
+          event.preventDefault();
+          resetData();
 
-      links.forEach(link => {
-        if (ethAddressRegex.test(link.href)) {
-          // On Mouse Over
-          link.addEventListener("mouseenter", event => {
-            event.preventDefault();
-            resetData();
+          const address = element?.href?.match(ethAddressRegex)?.[0] ?? "";
+          if (!isAddress(address) && !isAddress(ethAddress)) return;
+          setAddress(ethAddress || address);
+          setIsHovering(true);
 
-            const address = link.href?.match(ethAddressRegex)?.[0] ?? "";
-            if (!isAddress(address)) return;
-            setAddress(address);
-            setIsHovering(true);
+          element.style.color = color;
 
-            link.style.color = color;
+          const rect = element.getBoundingClientRect();
+          const top = rect.top + window.scrollY + (rect.height + 8);
+          const bottom = rect.top + window.scrollY - 8;
+          const leftMargin =
+            rect.left +
+            window.scrollX +
+            (rect.width > 305 ? (rect.width - 305) / 2 : 0);
+          const left =
+            window.innerWidth - leftMargin > 305
+              ? rect.left + rect.width / 2 > window.innerWidth / 2
+                ? leftMargin + rect.width - 305
+                : leftMargin
+              : window.innerWidth > 345
+              ? rect.left + rect.width / 2 > window.innerWidth / 2 &&
+                leftMargin + rect.width > 325
+                ? leftMargin + rect.width - 305
+                : window.innerWidth - 305 - 20
+              : 0;
 
-            const rect = link.getBoundingClientRect();
-            const top = rect.top + window.scrollY + (rect.height + 8);
-            const bottom = rect.top + window.scrollY - 8;
-            // X Offset Position
-            const leftMargin =
-              rect.left +
-              window.scrollX +
-              (rect.width > 305 ? (rect.width - 305) / 2 : 0);
-            const left =
-              window.innerWidth - leftMargin > 305
-                ? rect.left + rect.width / 2 > window.innerWidth / 2
-                  ? leftMargin + rect.width - 305
-                  : leftMargin
-                : window.innerWidth > 345
-                ? rect.left + rect.width / 2 > window.innerWidth / 2 &&
-                  leftMargin + rect.width > 325
-                  ? leftMargin + rect.width - 305
-                  : window.innerWidth - 305 - 20
-                : 0;
-
-            setModalPosition(p => {
-              return {
-                ...p,
-                top,
-                left,
-                bottom,
-                useBottom: rect.top > window.innerHeight / 2,
-              };
-            });
+          setModalPosition(p => {
+            return {
+              ...p,
+              top,
+              left,
+              bottom,
+              useBottom: rect.top > window.innerHeight / 2,
+            };
           });
+        });
 
-          // On Mouse Out
-          link.addEventListener("mouseleave", event => {
-            const link = event.target as HTMLAnchorElement;
-            link.style.color = "";
+        // On Mouse Leave
+        element.addEventListener("mouseleave", event => {
+          const element = event.target as HTMLAnchorElement;
+          element.style.color = "";
+          setIsHovering(false);
+        });
+      }
+    };
 
-            setIsHovering(false);
-          });
+    const convertAddresses = (node: HTMLElement) => {
+      Array.from(node.childNodes).forEach(childNode => {
+        if (childNode.nodeType === 3) {
+          // text node
+          const childContent = childNode.textContent;
+          if (
+            childContent.match(ethAddressRegexText) ||
+            childContent.match(ensNameRegex)
+          ) {
+            const isAlreadyWrapped =
+              childNode.parentElement?.classList.contains(
+                "web3-hovercards-address"
+              ) ||
+              childNode.parentElement?.classList.contains(
+                "web3-hovercards-ens"
+              );
+
+            if (!isAlreadyWrapped) {
+              const updatedContent = childContent
+                .replace(
+                  ethAddressRegex,
+                  '<span class="web3-hovercards-address">$&</span>'
+                )
+                .replace(
+                  ensNameRegex,
+                  '<span class="web3-hovercards-ens">$&</span>'
+                );
+
+              const wrapper = document.createElement("div");
+              wrapper.innerHTML = updatedContent;
+
+              while (wrapper.firstChild) {
+                node.insertBefore(wrapper.firstChild, childNode);
+              }
+
+              node.removeChild(childNode);
+            }
+          }
+        }
+      });
+
+      const ethAddrSpans = node.getElementsByClassName(
+        "web3-hovercards-address"
+      );
+      const ensSpans = node.getElementsByClassName("web3-hovercards-ens");
+
+      Array.from(ethAddrSpans).forEach((span: HTMLElement) => {
+        const address = span.textContent;
+        attachListeners(span, address);
+      });
+      Array.from(ensSpans).forEach(async (span: HTMLElement) => {
+        const ensName = span.textContent;
+        const addr = await web3.eth.ens.getAddress(ensName);
+        if (addr) {
+          attachListeners(span, addr);
         }
       });
     };
 
-    attachEventListeners();
+    const setup = () => {
+      const links = Array.from(document.getElementsByTagName("a"));
+      links.forEach(link => attachListeners(link));
 
-    const observer = new MutationObserver(attachEventListeners);
+      validTags.forEach(tag => {
+        const nodes = document.getElementsByTagName(tag);
+        Array.from(nodes).forEach(convertAddresses);
+      });
+    };
+
+    setup();
+
+    const observeMutations = (mutationsList: MutationRecord[]) => {
+      for (const mutation of mutationsList) {
+        if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+          Array.from(mutation.addedNodes).forEach((addedNode: HTMLElement) => {
+            if (
+              addedNode.nodeType === 1 &&
+              addedNode.tagName.toLowerCase() === "a" &&
+              ethAddressRegex.test((addedNode as HTMLAnchorElement).href ?? "")
+            ) {
+              attachListeners(addedNode as HTMLAnchorElement);
+            } else if (
+              addedNode.nodeType === 1 &&
+              validTags.includes(addedNode.tagName.toLowerCase())
+            ) {
+              convertAddresses(addedNode);
+            }
+          });
+        }
+      }
+    };
+
+    const observer = new MutationObserver(observeMutations);
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {

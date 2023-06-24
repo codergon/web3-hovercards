@@ -54,6 +54,10 @@ function App(): JSX.Element {
           ? modalPosition.top
           : modalPosition.bottom,
         transform: `translate(0%, ${modalPosition.useBottom ? -100 : 0}%)`,
+        boxShadow:
+          frameHeight > 0
+            ? "rgba(101, 119, 134, 0.2) 0px 0px 15px, rgba(101, 119, 134, 0.15) 0px 0px 3px 1px"
+            : "none",
       }}
       head={[
         <meta key={"notes-charSet"} charSet="utf-8" />,
