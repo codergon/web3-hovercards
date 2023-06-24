@@ -1,0 +1,200 @@
+.web3-hovercard {
+  width: 305px;
+  display: flex;
+  z-index: 10e4;
+  max-width: 100vw;
+  padding: 13px 0px;
+  background: #fff;
+  border-radius: 12px;
+  letter-spacing: 0.4px;
+  flex-direction: column;
+  box-shadow: rgba(255, 255, 255, 0.2) 0px 0px 15px,
+    rgba(255, 255, 255, 0.15) 0px 0px 3px 1px;
+  box-shadow: rgba(101, 119, 134, 0.2) 0px 0px 15px,
+    rgba(101, 119, 134, 0.15) 0px 0px 3px 1px;
+
+  a,
+  div,
+  button {
+    display: flex;
+    outline: none;
+  }
+
+  &__header {
+    gap: 12px;
+    width: 100%;
+    align-items: center;
+    flex-direction: row;
+    padding: 0px 13px 18px;
+    &-img {
+      flex: none;
+      width: 39px;
+      height: 39px;
+      color: #fff;
+      overflow: hidden;
+      border-radius: 50px;
+      align-items: center;
+      background: #2a2a2a;
+      justify-content: center;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    &-text {
+      flex: 1;
+      overflow: hidden;
+      flex-direction: column;
+      &--row {
+        gap: 5px;
+        align-items: center;
+        flex-direction: row;
+        &.margin {
+          color: #888;
+          margin-top: 1px;
+          svg {
+            margin-top: 0px;
+            margin-bottom: -1px;
+          }
+        }
+        &.address {
+          cursor: pointer;
+          max-width: max-content;
+        }
+
+        svg {
+          color: #888;
+          margin-top: -2px;
+        }
+
+        p {
+          line-break: anywhere;
+          &.address {
+            font-size: 12.8px;
+            text-transform: uppercase;
+            span {
+              color: #888;
+              text-transform: lowercase;
+            }
+          }
+          &.ens {
+            color: #888;
+            font-size: 13px;
+            text-transform: lowercase;
+            span {
+              font-size: 11.6px;
+              text-transform: uppercase;
+              &.normal {
+                text-transform: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &__details {
+    gap: 11px;
+    width: 100%;
+    flex-direction: column;
+    &-stats {
+      width: 100%;
+      padding: 0px 13px;
+      flex-direction: row;
+      justify-content: space-between;
+      &--item {
+        font-size: 12px;
+        align-items: center;
+        flex-direction: column;
+        .main {
+          font-size: #000;
+        }
+        .sub {
+          color: #888;
+          font-size: 12px;
+        }
+      }
+    }
+    &-nfts {
+      gap: 12px;
+      width: 100%;
+      flex-direction: column;
+
+      &__preview {
+        flex: 1;
+        width: 100%;
+        height: max-content;
+        align-items: center;
+        flex-direction: row;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        button {
+          display: flex;
+          cursor: pointer;
+          position: relative;
+          width: calc(100% / 3);
+          img {
+            width: 100%;
+            font-size: 12px;
+            object-fit: cover;
+            aspect-ratio: 0.85;
+            background-color: #fff;
+            &:not(:first-child) {
+              border-left: 0.2px solid #ddd;
+            }
+          }
+          .overlay {
+            display: none;
+          }
+          &:hover {
+            .overlay {
+              width: 100%;
+              height: 100%;
+              display: flex;
+              position: absolute;
+              background: #ffffff33;
+            }
+          }
+        }
+      }
+
+      &__info {
+        gap: 11px;
+        width: 100%;
+        padding: 0px 13px;
+        flex-direction: row;
+        &-preview {
+          padding-top: 2px;
+          height: max-content;
+          align-items: center;
+          flex-direction: row;
+          img {
+            width: 24px;
+            height: 24px;
+            object-fit: cover;
+            border-radius: 38px;
+            border: 1px solid #000;
+            background-color: #fff;
+            &:not(:first-child) {
+              margin-left: -10px;
+            }
+            @for $i from 1 through 3 {
+              &:nth-child(#{$i}) {
+                z-index: (4 - $i);
+              }
+            }
+          }
+        }
+        &-text {
+          flex: 1;
+          color: #888;
+          font-size: 12px;
+          overflow: hidden;
+          line-break: anywhere;
+        }
+      }
+    }
+  }
+}

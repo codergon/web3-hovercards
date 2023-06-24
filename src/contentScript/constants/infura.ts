@@ -1,0 +1,4 @@
+const INFURA_API_KEY = "";
+const INFURA_API_KEY_SECRET = "";
+
+export { INFURA_API_KEY, INFURA_API_KEY_SECRET };

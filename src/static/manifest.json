@@ -1,27 +1,33 @@
 {
   "manifest_version": 3,
-  "name": "React Chrome",
-  "description": "React.js Chrome Extension starter",
+  "name": "Web3 Hovercards",
+  "description": "Hovercards to show information about Ethereum addresses and ENS names",
   "version": "1.0.0",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "React Boilerplate",
-    "default_icon": "icon.png"
+    "default_title": "Web3 Hovercards",
+    "default_icon": "icons/icon128.png"
   },
   "permissions": ["tabs", "bookmarks", "storage", "identity"],
   "icons": {
-    "16": "icon.png",
-    "48": "icon.png",
-    "128": "icon.png"
+    "16": "icons/icon128.png",
+    "48": "icons/icon128.png",
+    "128": "icons/icon128.png"
   },
-  "options_page": "options.html",
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["contentScript.js"]
+      "js": ["contentScript.js"],
+      "match_origin_as_fallback": true,
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "resources": ["fonts/*", "images/*", "styles/*"]
     }
   ]
 }
