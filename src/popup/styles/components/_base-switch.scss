@@ -1,0 +1,29 @@
+.base-switch {
+  width: 36px;
+  height: 20px;
+  display: flex;
+  cursor: pointer;
+  position: relative;
+  align-items: center;
+  flex-direction: row;
+  border-radius: 30px;
+  border: none !important;
+  background-color: #ddd;
+  &-toggle {
+    left: 2.5px;
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    background: #fff;
+    border-radius: 15px;
+    transition: left 0.3s;
+    border: none !important;
+  }
+  &[data-move="true"] {
+    background-color: #116aea;
+    .base-switch-toggle {
+      left: 50%;
+      background: #fff !important;
+    }
+  }
+}

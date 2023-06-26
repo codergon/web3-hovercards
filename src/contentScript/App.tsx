@@ -35,7 +35,19 @@ function App(): JSX.Element {
 
   useEffect(() => {
     setFrameHeight(bounds.height);
-  }, [bounds.width, bounds.height]);
+    const container = document.getElementById("web3-hovercard-modal");
+    if (!container) return;
+    // Container position has been set to absolute already
+    container.style.width = bounds.width + "px";
+    container.style.height = bounds.height + "px";
+    container.style.left = modalPosition.left + "px";
+    container.style.top = !modalPosition.useBottom
+      ? modalPosition.top + "px"
+      : modalPosition.bottom + "px";
+    container.style.transform = `translate(0%, ${
+      modalPosition.useBottom ? -100 : 0
+    }%)`;
+  }, [bounds.width, bounds.height, modalPosition]);
 
   return (
     <Frame
@@ -49,11 +61,6 @@ function App(): JSX.Element {
         colorScheme: "none",
         borderRadius: "12px",
         position: "absolute",
-        left: modalPosition.left,
-        top: !modalPosition.useBottom
-          ? modalPosition.top
-          : modalPosition.bottom,
-        transform: `translate(0%, ${modalPosition.useBottom ? -100 : 0}%)`,
         boxShadow:
           frameHeight > 0
             ? "rgba(101, 119, 134, 0.2) 0px 0px 15px, rgba(101, 119, 134, 0.15) 0px 0px 3px 1px"

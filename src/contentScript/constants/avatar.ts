@@ -1,8 +1,7 @@
 const avatars = [
-  "images/plant.svg",
-  "images/leaves.svg",
-  "images/plant-small.svg",
-  "images/leaves-small.svg",
+  "images/avatar-1.png",
+  "images/avatar-2.png",
+  "images/avatar-3.png",
 ];
 
 export { avatars };

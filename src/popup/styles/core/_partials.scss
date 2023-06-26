@@ -1,18 +1,22 @@
 // FLEXDIRECTION -> ROW
 %row-center {
+  display: flex;
   align-items: center;
   flex-direction: row;
 }
 %row-spaced {
+  display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
-%row-center-spaced {
+%row-spaced-center {
+  display: flex;
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
 }
 %row-middle {
+  display: flex;
   align-items: center;
   flex-direction: row;
   justify-content: center;
@@ -20,19 +24,23 @@
 
 // FLEXDIRECTION -> COLUMN
 %column-center {
+  display: flex;
   align-items: center;
   flex-direction: column;
 }
 %column-spaced {
+  display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-%column-center-spaced {
+%column-spaced-center {
+  display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: space-between;
 }
 %column-middle {
+  display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: center;

@@ -8,10 +8,12 @@ import React, {
 import Web3 from "web3";
 import axios from "axios";
 import { isAddress } from "web3-validator";
+import { useNetworkState } from "react-use";
 import { fixURL } from "../helpers/address";
 import { avatars } from "../constants/avatar";
 import { InfuraProvider } from "@ethersproject/providers";
 import { INFURA_API_KEY, INFURA_API_KEY_SECRET } from "../constants/infura";
+import chroma from "chroma-js";
 
 const ensNameRegex = /[a-zA-Z0-9-]+\.eth\b/g;
 const ethAddressRegex = /(0x[a-fA-F0-9]{40})/;
@@ -81,18 +83,17 @@ export const useAddressInfo = (): AddressInfoContextProps =>
   useContext(AddressInfoContext);
 
 const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
-  const [address, setAddress] = useState("");
+  const onlineState = useNetworkState();
 
   const [ens, setENS] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [address, setAddress] = useState("");
   const [balance, setBalance] = useState("");
   const [ethPrice, setEthPrice] = useState(0);
   const [NFTs, setNFTs] = useState<any[]>([]);
-  const [color, setColor] = useState("#FFC0CB");
   const [usdBalance, setUSDBalance] = useState(0);
   const [isContract, setIsContract] = useState(false);
   const [transactionCount, setTransactionCount] = useState("");
-  const [showLargePreview, setShowLargePreview] = useState(true);
   const [status, setStatus] = useState({
     ens: "loading",
     balance: "loading",
@@ -106,10 +107,32 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
     bottom: 0,
     useBottom: false,
   });
-
   const [fetchedData, setFetchedData] = useState<Record<string, AddressInfo>>(
     {}
   );
+
+  // Settings
+  const [color, setColor] = useState("");
+  const [shouldHighlight, setShouldHighlight] = useState(undefined);
+
+  const [showHovercards, setShowHovercards] = useState(true);
+  const [showLargePreview, setShowLargePreview] = useState(true);
+
+  const fetchSettings = async () => {
+    const { highlight, largePreview, showHovercards, highlightColor } =
+      await chrome.storage.local.get([
+        "highlight",
+        "largePreview",
+        "showHovercards",
+        "highlightColor",
+      ]);
+
+    setColor(chroma.valid(highlightColor) ? highlightColor : "#FFC0CB");
+    setShouldHighlight(highlight !== undefined ? highlight : true);
+
+    if (largePreview !== undefined) setShowLargePreview(largePreview);
+    if (showHovercards !== undefined) setShowHovercards(showHovercards);
+  };
 
   const fetchEtherPrice = async () => {
     try {
@@ -141,6 +164,10 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
   const fetchAddressDetails = async (): Promise<void> => {
     // Validate address
     if (!isAddress(address)) return;
+    // Check if user has disabled hovercards
+    if (!showHovercards) return;
+    // Check if user is offline
+    if (!onlineState.online && !fetchedData[address]) return;
 
     try {
       const addrSub = address.substring(0, 4);
@@ -198,9 +225,10 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
 
       const checkENS = async () => {
         try {
-          if (fetchedData[address]?.ens !== undefined) {
+          if (!!fetchedData[address]?.ens) {
             setENS(fetchedData[address].ens);
           } else {
+            setStatus(prevStatus => ({ ...prevStatus, ens: "loading" }));
             const provider = new InfuraProvider("mainnet", INFURA_API_KEY);
             const name = await provider.lookupAddress(address);
             setENS(name || "");
@@ -249,6 +277,7 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
   }, [status, balance, ethPrice]);
 
   useEffect(() => {
+    fetchSettings();
     fetchEtherPrice();
   }, []);
 
@@ -305,6 +334,8 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
   }, [isHovering]);
 
   useEffect(() => {
+    if (!color || !shouldHighlight) return;
+
     const attachListeners = (
       element: HTMLElement & { href?: string },
       ethAddress?: string
@@ -314,6 +345,7 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
         ethAddressRegex.test(element?.href)
       ) {
         // On Mouse Enter
+
         element.addEventListener("mouseenter", event => {
           event.preventDefault();
           resetData();
@@ -323,7 +355,7 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
           setAddress(ethAddress || address);
           setIsHovering(true);
 
-          element.style.color = color;
+          if (shouldHighlight) element.style.color = color;
 
           const rect = element.getBoundingClientRect();
           const top = rect.top + window.scrollY + (rect.height + 8);
@@ -462,7 +494,7 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [shouldHighlight, color]);
 
   return (
     <AddressInfoContext.Provider

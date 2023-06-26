@@ -5,6 +5,7 @@ import AddressInfoProvider from "./context/AddressInfoContext";
 
 function init() {
   const appContainer = document.createElement("div");
+  appContainer.style.position = "absolute";
   appContainer.id = "web3-hovercard-modal";
   appContainer.style.zIndex = "2147483647";
   document.body.appendChild(appContainer);
