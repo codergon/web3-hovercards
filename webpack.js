@@ -67,7 +67,7 @@ module.exports = (env, argv) => {
       }),
 
       new MiniCSSExtractPlugin({
-        filename: "styles/foreground.css",
+        filename: "styles/web3-hovercard.css",
       }),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: true,

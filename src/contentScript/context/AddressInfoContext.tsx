@@ -16,7 +16,7 @@ import { INFURA_API_KEY, INFURA_API_KEY_SECRET } from "../constants/infura";
 import chroma from "chroma-js";
 
 const ensNameRegex = /[a-zA-Z0-9-]+\.eth\b/g;
-const ethAddressRegex = /(0x[a-fA-F0-9]{40})/;
+const ethAddressRegex = /0x[a-fA-F0-9]{40}\b/g;
 const ethAddressRegexText = /0x[a-fA-F0-9]{40}\b/g;
 const validTags = [
   "div",
@@ -27,8 +27,15 @@ const validTags = [
   "i",
   "b",
   "td",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
   "strong",
   "small",
+  "button",
 ];
 
 const Auth = btoa(INFURA_API_KEY + ":" + INFURA_API_KEY_SECRET);
@@ -342,13 +349,19 @@ const AddressInfoProvider = ({ children }: AddressInfoProviderProps) => {
     ) => {
       if (
         ethAddressRegex.test(ethAddress) ||
-        ethAddressRegex.test(element?.href)
+        ethAddressRegex.test(element?.href) ||
+        ensNameRegex.test(element?.href)
       ) {
         // On Mouse Enter
-
-        element.addEventListener("mouseenter", event => {
+        element.addEventListener("mouseenter", async event => {
           event.preventDefault();
           resetData();
+
+          if (ensNameRegex.test(element?.href)) {
+            const ensName = element?.href?.match(ensNameRegex)?.[0] ?? "";
+            const addr = await web3.eth.ens.getAddress(ensName);
+            ethAddress = addr;
+          }
 
           const address = element?.href?.match(ethAddressRegex)?.[0] ?? "";
           if (!isAddress(address) && !isAddress(ethAddress)) return;

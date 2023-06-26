@@ -67,11 +67,11 @@ function App(): JSX.Element {
             : "none",
       }}
       head={[
-        <meta key={"notes-charSet"} charSet="utf-8" />,
+        <meta key={"web3-hovercard-charSet"} charSet="utf-8" />,
         <link
           rel="stylesheet"
-          key={"notes-css"}
-          href={chrome.runtime.getURL("styles/foreground.css")}
+          key={"web3-hovercard-css"}
+          href={chrome.runtime.getURL("styles/web3-hovercard.css")}
         />,
       ]}
     >
