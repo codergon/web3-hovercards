@@ -1,4 +1,8 @@
-# Web3-hovercards
+<div align="center">
+    <h1 style="padding-bottom: 16px"><img align="center" src="./src/static/icons/icon128.png" style="border-radius: 4px; height: 50px; margin-right: 10px;" />
+    Web3-hovercards
+    </h1>
+</div>
 
 Web3-hovercards is a Chrome extension that displays relevant information about Ethereum addresses and ENS names in a user-friendly hovercard modal. It provides valuable insights, including transaction count, balance(in Ether and USD), associated ENS names, and NFTs, enhancing your browsing experience.
 
