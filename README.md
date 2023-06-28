@@ -18,7 +18,7 @@ Once the extension is installed, it will automatically activate when browsing we
 
 To install Web3-hovercards:
 
-- Go to the [Chrome Web Store](https://chrome.google.com/webstore) and search for "Web3 Hovercards" or visit the [Web3 Hovercards page](https://chrome.google.com/webstore/detail/fhfacijlgfbbpeigpdnjkgopjdgcmilj) directly. To setup the extension locally, please follow the instructions [below](#local-setup)
+- Go to the [Chrome Web Store](https://chrome.google.com/webstore) and search for "Web3 Hovercards" or visit the [Web3 Hovercards page](https://chrome.google.com/webstore/detail/mlanaepdepnhnmboakpiicbbfobjkojp) directly. To setup the extension locally, please follow the instructions [below](#local-setup)
 
 ## Local setup
 
